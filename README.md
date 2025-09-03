@@ -46,7 +46,7 @@ This repo documents my Journey from Junior DBA → Data Platform Engineer as I b
 
 ## 📌 Progress Tracking
 
-- [ ] SQL Basics
+- [x] SQL Basics
 - [ ] DBA Fundamentals
 - [ ] Fabric Pipelines
 - [ ] Fabric Governance
