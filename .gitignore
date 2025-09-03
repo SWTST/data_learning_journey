@@ -1,0 +1,16 @@
+# VS Code settings
+.vscode/
+
+# Python cache and compiled files
+__pycache__/
+*.pyc
+
+# Data files
+*.csv
+*.parquet
+*.db
+*.bak
+
+# OS-specific files
+.DS_Store
+Thumbs.db
