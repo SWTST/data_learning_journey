@@ -16,7 +16,14 @@ This repo documents my Journey from Junior DBA → Data Platform Engineer as I b
 
 ## 📂 Repository Structure
 
-
+```
+/sql-tuning-examples    → Query optimisation, execution plan notes, before/after comparisons
+/fabric-pipelines       → Fabric Data Factory pipelines, Lakehouse scripts, governance examples
+/python-pandas          → Python + Pandas practice notebooks and scripts
+/pyspark                → PySpark transformations and demos
+/notes                  → Study notes, certification prep, summaries
+/projects               → End-to-end mini projects (SQL → Fabric → BI)
+```
 ---
 
 ## 🛠 Tools & Platforms
