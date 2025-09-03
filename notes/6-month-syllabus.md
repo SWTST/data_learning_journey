@@ -20,7 +20,7 @@
 - Fabric (Tue/Thu): Add governance/security (roles, permissions, lineage).
 - Python (Wed): Pandas intermediate: joins, grouping, cleaning data.
 - Review (Fri): Publish a mini case study: “Migrating a CSV into Fabric pipeline.”
-
+- [ ]
 ## December 2025 [ ]
 
 - SQL (Mon): Section 10 (User Management). **Stop rule reached** ✅.
