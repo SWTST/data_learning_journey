@@ -46,14 +46,14 @@ This repo documents my Journey from Junior DBA → Data Platform Engineer as I b
 
 ## 📌 Progress Tracking
 
-- [] SQL Basics
-- [] DBA Fundamentals
-- [] Fabric Pipelines
-- [] Fabric Governance
-- [] DP-600 Certification
-- [] Python (Pandas)
-- [] PySpark
-- [] Portfolio Projects
+- [ ] SQL Basics
+- [ ] DBA Fundamentals
+- [ ] Fabric Pipelines
+- [ ] Fabric Governance
+- [ ] DP-600 Certification
+- [ ] Python (Pandas)
+- [ ] PySpark
+- [ ] Portfolio Projects
 
 ---
 
