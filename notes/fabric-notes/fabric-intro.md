@@ -21,7 +21,7 @@
 
 As a SaaS, Fabric unifies new and existing components from Power BI, Azure Synapse Analytics, Azure Data Factory and more into a single environment.
 
-<img>![alt text](/data_learning_journey/notes/fabric-notes/images-diagrams/UnifiSaas.png)</img>
+![alt text](/data_learning_journey/notes/fabric-notes/images-diagrams/UnifiSaas.png)
 
 Fabric integrates workloads like Data Engineering, Data factory, Data science, Data warehouse, Real-Time Intelligence, Industry Solutions, Databases and Power BI into a SaaS platform. Each of these workloads is tailored for distinct user roles like Data engineers, Scientists, or warehousing professionals, and they serve a specific task.
 
