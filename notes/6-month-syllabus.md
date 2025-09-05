@@ -5,7 +5,7 @@
 - [ ] SQL: Finish Section 6 (Queries) → start Section 7 (System DBs).
 - [ ] Fabric: Intro modules (Lakehouse, Data Factory basics).
 - [ ] Python: Codecademy: Python syntax → data types, loops, file I/O.
-- [ ] Review: Notes + maybe first GitHub repo (“SQL tuning examples”).
+- [ ] Review: Notes + SQL tuning examples
 
 ## 🎃 October 2025
 - [ ] **Month Complete**
