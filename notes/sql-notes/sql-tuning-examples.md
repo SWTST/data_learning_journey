@@ -27,11 +27,41 @@ INNER JOIN [Person].[PhoneNumberType] pt ON pp.PhoneNumberTypeID = pt.PhoneNumbe
 WHERE pt.Name LIKE 'Cell'
 AND p.ModifiedDate >= '2010-01-01 00:00:00.000'
 AND LastName NOT LIKE 'Adams'
-ORDER BY p.BusinessEntityID ASC
+ORDER BY p.FirstNAME ASC
 ```
 The executions times and query plan, before tuning, are below:
 
  SQL Server Execution Times:
-   CPU time = 78 ms,  elapsed time = 789 ms.
+   CPU time = 94 ms,  elapsed time = 836 ms.
 
-[! image](images-diagrams/Query1.png)
+![Image](../../images-diagrams/Query1.png)
+
+1 - Asking for TOP 100 drops time (obviously):  
+SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 143 ms.
+
+Tried creating an Index on Person.Person.FirstName including all columns in person section of the query. - No effect
+
+Tried creating statistics on FirstName to see if this effected use of Index - No effect
+
+***Finding this difficult will return to this query***
+
+## Query 2 - AdventureWorks2022
+
+This query contains the following:
+- A where clause with leading wildcard
+- Order by
+```
+SQL
+
+SELECT TOP (50) p.ProductID, p.Name, p.ListPrice
+FROM Production.Product AS p
+WHERE p.Name LIKE '%mountain%'
+ORDER BY p.ListPrice DESC;
+```
+The execution times and query plan, before tuning, are below:
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 101 ms.
+
+![image](../../images-diagrams/Query2.png)
