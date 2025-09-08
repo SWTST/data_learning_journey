@@ -32,7 +32,7 @@ WHERE
 
 ## Types of Expressions
 
-### SQL Boolean Expresions
+### SQL Boolean Expressions
 
 ```
 SELECT *
