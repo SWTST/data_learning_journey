@@ -64,4 +64,3 @@ FROM TableName
 WHERE (Column1 = 'Value1' AND Column2 = 'Value2')
 OR (Column1 = 'Value3')
 ```
-***--Lecture end--***
