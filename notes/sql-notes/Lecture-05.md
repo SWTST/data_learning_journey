@@ -1,11 +1,10 @@
 ```
-title: "Lecture 05 – Operators, Expressions and Conditions"
+title: "Lecture 05: Operators, Expressions and Conditions"
 date: 2025-09-08
 course: Microsoft SQL Server Database Administation Course
 tags: [#sql-basics, #sql-queries]
 summary: How Operators, Expressions and Conditions are used in SQL Queries
 ```
-
 # Operators, Expressions and Conditions 
 
 ## Types of Operators

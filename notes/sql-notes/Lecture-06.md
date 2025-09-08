@@ -1,10 +1,11 @@
 ```
-title: "Lecture 06 – WHERE, ORDER BY, HAVING, GROUP BY"
+title: "Lecture 06: WHERE, ORDER BY, HAVING, GROUP BY"
 date: 2025-09-08
 course: Microsoft SQL Server Database Administation Course
-tags: [#sql-basics, #sql-queries, #sql-joins]
-summary: How clauses are used in SQL Queries and Data manipulation
+tags: [#sql-basics, #sql-queries]
+summary: How clauses are used in SQL Queries
 ```
+
 # WHERE, ORDER BY, HAVING BY, GROUP BY
 
 ### WHERE
