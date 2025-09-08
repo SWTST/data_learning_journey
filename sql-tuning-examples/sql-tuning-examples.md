@@ -34,7 +34,7 @@ The executions times and query plan, before tuning, are below:
  SQL Server Execution Times:
    CPU time = 94 ms,  elapsed time = 836 ms.
 
-![Image](../../images-diagrams/Query1.png)
+![Image](../images-diagrams/Query1.png)
 
 1 - Asking for TOP 100 drops time (obviously):  
 SQL Server Execution Times:
@@ -64,4 +64,4 @@ The execution times and query plan, before tuning, are below:
  SQL Server Execution Times:
    CPU time = 0 ms,  elapsed time = 101 ms.
 
-![image](../../images-diagrams/Query2.png)
+![image](../images-diagrams/Query2.png)
