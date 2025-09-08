@@ -40,9 +40,9 @@ The executions times and query plan, before tuning, are below:
 SQL Server Execution Times:
    CPU time = 0 ms,  elapsed time = 143 ms.
 
-Tried creating an Index on Person.Person.FirstName including all columns in person section of the query. - No effect
+Tried creating an Index on Person.Person.FirstName including all columns in person section of the query. - **No effect**
 
-Tried creating statistics on FirstName to see if this effected use of Index - No effect
+Tried creating statistics on FirstName to see if this effected use of Index - **No effect**
 
 ***Finding this difficult will return to this query***
 
