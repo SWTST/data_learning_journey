@@ -1,3 +1,12 @@
+```
+title: "Lecture 035 – Operators, Expressions and Conditions"
+date: 2025-09-08
+course: Microsoft SQL Server Database Administation Course
+tags: []
+summary: 
+```
+
+
 # Operators, Expressions and Conditions 
 
 ## Types of Operators
