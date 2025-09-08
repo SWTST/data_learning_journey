@@ -1,11 +1,10 @@
 ```
-title: "Lecture 035 – Operators, Expressions and Conditions"
+title: "Lecture 05 – Operators, Expressions and Conditions"
 date: 2025-09-08
 course: Microsoft SQL Server Database Administation Course
-tags: []
-summary: 
+tags: [#sql-basics, #sql-queries]
+summary: How Operators, Expressions and Conditions are used in SQL Queries
 ```
-
 
 # Operators, Expressions and Conditions 
 
@@ -67,13 +66,3 @@ WHERE (Column1 = 'Value1' AND Column2 = 'Value2')
 OR (Column1 = 'Value3')
 ```
 ***--Lecture end--***
-
-# WHERE, ORDER BY, HAVING BY, GROUP BY
-
-### WHERE
-
-### ORDER BY
-
-### HAVING BY
-
-### GROUP BY
