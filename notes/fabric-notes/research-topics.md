@@ -1,0 +1,6 @@
+- *Data Mirroring:* https://learn.microsoft.com/en-us/fabric/mirroring/overview
+- *Data Factory:* https://learn.microsoft.com/en-us/fabric/data-factory/data-factory-overview
+- *Real-Time Intelligence:* https://learn.microsoft.com/en-us/fabric/real-time-intelligence/overview
+- *Data Engineering:* https://learn.microsoft.com/en-us/fabric/data-engineering/data-engineering-overview
+- *Fabric Data science:* https://learn.microsoft.com/en-us/fabric/data-science/data-science-overview
+- *Fabric Data warehouse:* https://learn.microsoft.com/en-us/fabric/data-warehouse/data-warehousing

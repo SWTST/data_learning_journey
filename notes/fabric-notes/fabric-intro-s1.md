@@ -1,6 +1,13 @@
+```
+title: "Session 1: Fabric Introduction"
+date: 2025-09-04
+content: Microsoft Learn 
+tags: [#fabric-intro]
+summary: What is Fabric and how do its key components interact?
+```
 # Fabric Introduction
 
- ### **Session Intent (04/09/2025):** Learn what Fabric is and how its Key components (OneLake, Data factory, LakeHouse, PowerBi) fit together.
+ ### **Session Intent:** Learn what Fabric is and how its Key components (OneLake, Data factory, LakeHouse, PowerBi) fit together.
 
  ## <u>**What is Microsoft Fabric?**</u>
 
@@ -45,12 +52,7 @@ Fabric integrates workloads like Data Engineering, Data factory, Data science, D
 - **Fabric Data Science** - Fabric Data Science enables you to build, deploy, and operationalize machine learning models from Fabric. It integrates with Azure Machine Learning to provide built-in experiment tracking and model registry. Data scientists can enrich organizational data with predictions and business analysts can integrate those predictions into their BI reports, allowing a shift from descriptive to predictive insights. 
 - **Fabric Data Warehouse** - Fabric Data Warehouse provides industry leading SQL performance and scale. It separates compute from storage, enabling independent scaling of both components. Additionally, it natively stores data in the open Delta Lake format.
 
-- *Data Mirroring:* https://learn.microsoft.com/en-us/fabric/mirroring/overview
-- *Data Factory:* https://learn.microsoft.com/en-us/fabric/data-factory/data-factory-overview
-- *Real-Time Intelligence:* https://learn.microsoft.com/en-us/fabric/real-time-intelligence/overview
-- *Data Engineering:* https://learn.microsoft.com/en-us/fabric/data-engineering/data-engineering-overview
-- *Fabric Data science:* https://learn.microsoft.com/en-us/fabric/data-science/data-science-overview
-- *Fabric Data warehouse:* https://learn.microsoft.com/en-us/fabric/data-warehouse/data-warehousing
+***Further Research related to the above topics and (?) in research-topics.md ...***
 
 Fabric enables organizations and individuals to turn large and complex data repositories into actionable workloads and analytics, and is an implementation of data mesh architecture.
 
@@ -58,4 +60,4 @@ Fabric enables organizations and individuals to turn large and complex data repo
 
 Fabric is an All-in-One platform for managing data as an organisation. It combines current Workloads and introduces new workloads to allow users to achieve specific roles. PowerBI allows business users to visualise data themselves to strip away noise and share this with whoever necessary. Databases, Data factory and Data Engineering allow for control over the whole Data lifecycle; mirroring allows for exact data estate replication which can then be consumed by the Data Factory and Data Engineering components. Data Factory can ingest and prepare data through the use of Power Query and can connect to a multitude of Data Sources including On-Premises and In the cloud. Data Engineering allows the creation of infrastructure to optimise, collection, storage, processing and analysing of vast data volumes. Real-Time Intelligence allows for insight into Data-in-motion within the organisation by monitoring the entire data lifecycle. Fabric Data Science and Data warehouse are new workloads which are used to 1. provide proactive insights into BI reports through the use of AI and machine learning and 2. to provide SQL performance and scale through the separation of compute from storage, enabling independent scaling of both components. 
 
-### Next session continue to OneLake and data flow
+### Next session: What is OneLake and how does data flow through fabric?
