@@ -4,7 +4,7 @@
 - [ ] **Month Complete**
 - [ ] SQL: Finish Section 6 (Queries) → start Section 7 (System DBs).
 - [ ] Fabric: Intro modules (Lakehouse, Data Factory basics).
-- [ ] Python: Codecademy: Python syntax → data types, loops, file I/O.
+- [ ] Python: Codecademy: Learn Python 3 Course
 - [ ] Review: Notes + SQL tuning examples
 
 ## 🎃 October 2025
