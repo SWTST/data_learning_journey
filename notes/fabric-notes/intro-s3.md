@@ -25,6 +25,6 @@ In fabric, the different analytical engines (T-SQL, Apache Spark, Analysis Servi
 
 All Fabric compute experiences come preconfigured with OneLake as their native Data store.
 
-OneLake also lets you mount your existing PaaS storage accounts using the shortcut feature. Shortcuts provide direct access to data in ADLS. Also, shortcuts can be created to other storage systems, allowing you to analyze cross-cloud data. Fabric also uses intelligent caching to reduce egress charges.
+OneLake also lets you mount your existing PaaS storage accounts using the shortcut feature. Shortcuts provide direct access to data in ADLS. Also, shortcuts can be created to other storage systems, allowing you to analyse cross-cloud data. Fabric also uses intelligent caching to reduce egress charges.
 
 ### Next session: Explore more fabric topics (research-topics, other modules in Microsoft Learn)
