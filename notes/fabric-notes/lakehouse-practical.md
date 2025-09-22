@@ -21,7 +21,7 @@ The aims are to span over multiple sessions and give a well rounded practical in
 - [x] Create a new Pipeline.
 - [x] Add activities: Lookup → ForEach → Copy activity.
 - [x] Parameterise the source path (so you can reuse it easily).
-## *~Session 4 end~*
+### ***= Session 4 end =***
 
 We've create a lakehouse, manually loaded CSVs and viewed as tables, built a semantic model and report and created a basic pipeline to ingest a CSV file. The lookup finds the file but it fails on the **foreach** due to a length paramter error. We will continue with this plan.
 
