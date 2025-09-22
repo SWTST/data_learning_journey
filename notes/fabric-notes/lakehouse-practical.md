@@ -23,7 +23,7 @@ The aims are to span over multiple sessions and give a well rounded practical in
 - [x] Parameterise the source path (so you can reuse it easily).
 ### ***= Session 4 end =***
 
-We've create a lakehouse, manually loaded CSVs and viewed as tables, built a semantic model and report and created a basic pipeline to ingest a CSV file. The lookup finds the file but it fails on the **foreach** due to a length paramter error. We will continue with this plan.
+I've created a lakehouse, manually loaded CSVs and viewed as tables, built a semantic model and report, then created a basic pipeline to ingest a CSV file. The lookup finds the file but it fails on the **foreach** due to a length parameter error. I'll continue with this plan in my next session.
 
 ```
 The function 'length' expects its parameter to be an array or a string. The provided value is of type 'Object'.
