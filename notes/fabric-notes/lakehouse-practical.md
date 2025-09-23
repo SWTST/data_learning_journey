@@ -1,7 +1,6 @@
 ```
-title: "Session 4: Fabric Lakehouse Practical"
+title: "Fabric Lakehouse Practical"
 date: 2025-09-16
-content: 
 tags: [#fabric-intro, #lakehouse, #pipelines, #semantic-models]
 summary: Exploration of lakehouses and other fabric functionality 
 ```
@@ -21,16 +20,9 @@ The aims are to span over multiple sessions and give a well rounded practical in
 - [x] Create a new Pipeline.
 - [x] Add activities: Lookup → ForEach → Copy activity.
 - [x] Parameterise the source path (so you can reuse it easily).
-### ***= Session 4 end =***
-
-I've created a lakehouse, manually loaded CSVs and viewed as tables, built a semantic model and report, then created a basic pipeline to ingest a CSV file. The lookup finds the file but it fails on the **foreach** due to a length parameter error. I'll continue with this plan in my next session.
-
-```
-The function 'length' expects its parameter to be an array or a string. The provided value is of type 'Object'.
-```
-
-- [ ] Run the pipeline → confirm data lands in your Lakehouse.
+- [x] Run the pipeline → confirm data lands in your Lakehouse.
 - [ ] Note down failure handling options (retry, stop, continue).
+
 
 **<u>Step 3: Copy Job (Preview)</u>**
 
