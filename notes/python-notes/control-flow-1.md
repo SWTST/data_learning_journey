@@ -6,7 +6,7 @@ tags: [#python-basics, #python-syntax]
 summary: Python - Control Flow
 ```
 
-# Control Flow 1
+# Control Flow
 
 ## Match-Case statements
 
@@ -91,3 +91,11 @@ else:
 print(name + " asks: " + question)
 print("Magic 8-Ball's answer: " + answer)
 ```
+
+## Introduction to Bugs
+
+In python there are many different ways of classifying errors but some of the basic/most common are below:
+
+- SyntaxError: Error caused by not following the correct Python language structure (syntax).
+- NameError: Errors reported when the interpreter detects a variable that is unknown.
+- TypeError: Errors thrown when operations are applied to an object of inappropriate type.
