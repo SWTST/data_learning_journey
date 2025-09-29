@@ -20,7 +20,7 @@ Recitifying this error took longer than expected but managed it in the end.
 
 I also setup an email function to send an email if the intial Lookup or Copy Data functions failed.
 
-I found out that the LakeHouse SQL connection is only read so DDL statements are blocked/fail. It was suggested that I use a notebook to create a table/insert data.
+I found out that the LakeHouse SQL connection is only read so DDL statements are blocked/not useable. It was suggested that I use a notebook to create a table/insert data.
 
 The current Pipeline looks like the following:
 ![image](../../images-diagrams/pipeline-25092025.png)
