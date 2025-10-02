@@ -5,4 +5,5 @@ tags: [#onelake #lakehouse #data-factory #pipelines #governance #permissions #li
 summary: Setup and Ingestion (Bronze Layer) 
 ```
 
-# 
+# Setup & Ingestion - AdventureWorks
+
