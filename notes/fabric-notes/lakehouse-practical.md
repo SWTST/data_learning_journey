@@ -21,7 +21,7 @@ The aims are to span over multiple sessions and give a well rounded practical in
 - [x] Add activities: Lookup → ForEach → Copy activity.
 - [x] Parameterise the source path (so you can reuse it easily).
 - [x] Run the pipeline → confirm data lands in your Lakehouse.
-- [ ] Note down failure handling options (retry, stop, continue).
+- [x] Note down failure handling options (retry, stop, continue).
 
 
 **<u>Step 3: Copy Job (Preview)</u>**
