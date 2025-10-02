@@ -25,8 +25,10 @@ The final pipeline is structured as follows:
 I will decide whether to design pipelines relevant to whole table imports from SQL, in the interest of building practical skills, or research into Data factory and Data flow basics, further, to build my foundation.
 
 ### <u>Next session Aim:</u>
+
+**One of the following:**
 - Design pipelines for whole table ingestion (Practical and expands on Fabric skills)
-
-*OR*
-
+  
 - Research Fundamentals/basics of Dataflow and Datafactory further to build on foundational understanding
+
+- Continue with lakehouse-practical.md steps 4-8
