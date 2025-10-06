@@ -1,5 +1,5 @@
 ```
-title: "Lecture 14: What is a Function?"
+title: "Lecture 15: What is a Function?"
 date: 2025-10-06
 course: Microsoft SQL Server Database Administation Course
 tags: [#sql-basics, #sql-queries, #db-design]
