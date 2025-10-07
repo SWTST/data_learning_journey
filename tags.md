@@ -5,8 +5,8 @@
 #sql-basics
 #sql-queries
 #sql-joins
-#sql-dml (insert, update, delete)
-#sql-ddl (create, alter, drop)
+#sql-dml
+#sql-ddl
 #sql-performance
 #db-design
 #system-databases
