@@ -12,8 +12,23 @@ summary: Setup and Ingestion (Bronze Layer)
 - To create/move connection to Andromeda
 - Run the pipeline to copy data to Lakehouse
 
-### Completed:
-- Restored DB in Andromeda
-- Created views of converted columns
-- Created new connection to Andromeda;AdventureWorks2019
 
+I've restored the database to TDB-SQL-03 and have created a view of all tables that meet the condition 'SCHEMA IN ('Sales','Production','HumanResources','Person','Purchasing')', which converts the columns to delta-safe datatypes. After creating the new connection in Fabric, I could point the Pipeline source to these views and the destination to my 'bronze' schema in Fabric.
+
+My pipeline ran successfully, first finding the views, and then, copying the data to my schema:
+
+![image](../../../images-diagrams/migration-pipeline-bronze2.png)
+
+An issue I found intially was using the below inside my CopyData source activity. 
+```
+@item().FQTN
+```
+Since fabric was expecting a SQL query this is why it failed. Instead I used the below to format a query and this ran without issue.
+```
+@concat('SELECT * FROM ', item().FQTN)
+```
+
+### Next sessions aims:
+- Configure validation logging to monitor runtimes.
+- Implement CDC for incremental loads into tables.
+- Investigate first steps into cleaning and preparing data for silver/gold.
