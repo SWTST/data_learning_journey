@@ -15,9 +15,9 @@ This project simulates migrating an on-prem SQL Server (Biztrack) database into 
 
 **Aim: Ingest tables from AdventureWorks and Validate Ingestion**
 
-- [ ] Connect Fabric Data Factory pipeline to source SQL Server (AdventureWorks)
-- [ ] Create a Lakehouse.
-- [ ] Build pipeline(s) to copy raw tables into a bronze layer (parquet/delta).
+- [x] Connect Fabric Data Factory pipeline to source SQL Server (AdventureWorks)
+- [x] Create a Lakehouse.
+- [x] Build pipeline(s) to copy raw tables into a bronze layer (parquet/delta).
 - [ ] Validate ingestion using Spark notebooks or Data Explorer.
 
 ### **Output: Bronze lakehouse with raw tables.**
