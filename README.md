@@ -48,7 +48,7 @@ This repo documents my Journey from Junior DBA to aspiring Data Platform Enginee
 
 - [x] SQL Basics
 - [ ] DBA Fundamentals
-- [ ] Fabric Pipelines
+- [x] Fabric Pipelines
 - [ ] Fabric Governance
 - [ ] DP-600 Certification
 - [ ] Python (Pandas)
