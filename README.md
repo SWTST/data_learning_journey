@@ -2,7 +2,7 @@
 # 🚀 Data Platform Learning Journey
 
 Welcome to my personal learning repository!
-This repo documents my Journey from Junior DBA → Data Platform Engineer as I build my skills in SQL, Microsoft Fabric and Python.
+This repo documents my Journey from Junior DBA to aspiring Data Platform Engineer as I build my skills in SQL, Microsoft Fabric and Python. It includes notes on key learning areas and showcases various projects/mini-projects that I have completed along the way.
 
 ---
 
