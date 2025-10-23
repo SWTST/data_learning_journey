@@ -66,3 +66,54 @@ END
 CLOSE db_cursor  
 DEALLOCATE db_cursor;
 ```
+```
+-- Check all stored procedures for references
+CREATE PROCEDURE dbo.SHSP_databaseRefCheck @databaseRef VARCHAR(150)
+as
+
+BEGIN
+DECLARE @sql NVARCHAR(MAX)
+DECLARE @dbname SYSNAME
+
+
+DECLARE db_cursor CURSOR
+FOR SELECT name
+FROM sys.databases
+WHERE database_id > 4
+OPEN db_cursor
+FETCH NEXT FROM db_cursor INTO @dbname
+
+WHILE @@FETCH_STATUS = 0
+BEGIN
+	SET @sql = '
+	USE ['+@dbname+']	
+	IF EXISTS (
+				SELECT 1
+				FROM sys.sql_modules m
+				INNER JOIN sys.objects o ON m.object_id = o.object_id
+				WHERE o.type IN (''P'', ''V'', ''FN'', ''IF'', ''TF'')
+				AND m.definition LIKE ''%' + @databaseRef + '%''
+
+			)
+	BEGIN
+	SELECT 
+	'''+@dbname+''' as [Database] 
+	,o.name
+	,o.type_desc
+	,m.definition
+	,o.modify_date
+	,m.object_id
+	FROM sys.sql_modules m
+	INNER JOIN sys.objects o ON m.object_id = o.object_id
+	WHERE o.type IN (''P'', ''V'', ''FN'', ''IF'', ''TF'')
+	AND m.definition LIKE ''%' + @databaseRef + '%''
+	END'
+
+	EXEC sp_executesql @sql
+	FETCH NEXT FROM db_cursor
+	INTO @dbname
+	END
+CLOSE db_cursor
+DEALLOCATE db_cursor
+END
+```

@@ -5,7 +5,7 @@ tags: [#onelake #lakehouse #data-factory #pipelines]
 summary: Setup and Ingestion (Bronze Layer) 
 ```
 
-# Setup & Ingestion - AdventureWorks
+## BMP Session 1
 
 I've completed the following so far:
 

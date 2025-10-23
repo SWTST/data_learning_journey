@@ -4,7 +4,7 @@ date: 2025-10-07
 tags: [#onelake #lakehouse #data-factory #pipelines]
 summary: Setup and Ingestion (Bronze Layer) 
 ```
-# Setup & Ingestion - AdventureWorks
+## BMP Session 2
 
 ### Session aims:
 - To restore DB to andromeda
