@@ -1,5 +1,5 @@
 ```
-title: "Lecture 20: Overview of MSSQL Management Tools"
+title: "Lecture 20 & 21: Overview of MSSQL Management Tools"
 date: 2025-10-27
 course: Microsoft SQL Server Database Administation Course
 tags: [#sql-basics, #mssql-internals, #db-design, #sql-performance]
@@ -17,4 +17,17 @@ summary: An Overview of MSSQL Management tools and how they are used
 - **Database Engine Tuning Advisor:** Database Engine tuning Advisor helps create optimal sets of indexes, indexed views and partitions.
 
 - **SQL Server Data Tools:** SQL Server Data Tools provides an IDE forBuilding solutions for Business Intelligence components: Analysis Services, Reporting Services and Integration Services.
-  
+
+
+## SQL Server Management Studio (SSMS)
+
+SSMS is a generalised management platform for all kinds of SQL related work.
+
+Some utilisations of SSMS are:
+
+- Connecting to a local/remote SQL Server database engine, SSIS, SSRS and Analysis Services
+- Explore Server properties and its objects
+- Explore Databases and its objects.
+- New Query / Query Parsing / Execution / Results and Execution plans.
+- Monitor SQL server using Activity Monitor / sp_who2 & sp_whoisactive / SQL Logs
+- DBA Admin tasks (Backup / Logins / Jobs / Maintenance plans)
