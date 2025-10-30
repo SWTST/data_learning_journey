@@ -15,7 +15,7 @@ My pipeline now runs and my build logs table is populated correctly with my run 
 
 The data is now populated correctly. 
 
-The pipeline is visually unchanged but my notebook and variables/base parameters are below:
+The pipeline is visually unchanged but my notebook and variables/base parameters are aligned below:
 
 ### **Notebook structure:**
 ```
