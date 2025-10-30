@@ -1,10 +1,10 @@
 ```
-title: "Biztrack Migration Practical"
+title: "SQL to Fabric Migration Practical"
 date: 2025-10-14
 tags: [#onelake #lakehouse #data-factory #pipelines #dataflows-gen2]
 summary: Setup and Ingestion - Validation/Error Handling > Cleaning & Standardisation (Silver)
 ```
-## BMP Sessions 5
+## SFMP Sessions 5
 
 ### Session Aims:
 - Finish setup of runtime logging

@@ -1,11 +1,11 @@
 ```
-title: "Biztrack Migration Practical"
+title: "SQL to Fabric Migration Practical"
 date: 2025-10-02
 tags: [#onelake #lakehouse #data-factory #pipelines]
 summary: Setup and Ingestion (Bronze Layer) 
 ```
 
-## BMP Session 1
+## SFMP Session 1
 
 I've completed the following so far:
 

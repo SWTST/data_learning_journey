@@ -1,10 +1,10 @@
 ```
-title: "Biztrack Migration Practical"
+title: "SQL to Fabric Migration Practical"
 date: 2025-10-07
 tags: [#onelake #lakehouse #data-factory #pipelines]
 summary: Setup and Ingestion (Bronze Layer) 
 ```
-## BMP Session 2
+## SFMP Session 2
 
 ### Session aims:
 - To restore DB to andromeda
@@ -19,7 +19,7 @@ My pipeline ran successfully, first finding the views, and then, copying the dat
 
 ![image](../../../images-diagrams/migration-pipeline-bronze2.png)
 
-An issue I found intially was using the below inside my CopyData source activity. 
+An issue I found initially was using the below inside my CopyData source activity. 
 ```
 @item().FQTN
 ```

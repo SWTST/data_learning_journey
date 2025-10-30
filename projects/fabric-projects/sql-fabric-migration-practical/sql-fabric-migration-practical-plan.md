@@ -1,13 +1,13 @@
 ```
-title: "Biztrack Migration Practical"
+title: "SQL to Fabric Migration Practical"
 date: 2025-10-02
 tags: [#onelake #lakehouse #data-factory #pipelines #governance #permissions #lineage #semantic-models #powerbi #dataflows-gen2]
 summary: Ingestion and transformation of SQL Server data into Fabric to generate PowerBi reports. 
 ```
 
-# Biztrack Migration Practical
+# SQL to Fabric Migration Practical
 
-This project simulates migrating an on-prem SQL Server (Biztrack) database into Microsoft Fabric using the medallion architecture.
+This project simulates migrating an on-prem SQL Server database into Microsoft Fabric using the medallion architecture.
 
 ### **Goal: Deliver a Bronze → Silver → Gold pipeline with Power BI reporting on the gold layer.**
 
@@ -18,7 +18,7 @@ This project simulates migrating an on-prem SQL Server (Biztrack) database into 
 - [x] Connect Fabric Data Factory pipeline to source SQL Server (AdventureWorks)
 - [x] Create a Lakehouse.
 - [x] Build pipeline(s) to copy raw tables into a bronze layer (parquet/delta).
-- [ ] Validate ingestion using Spark notebooks or Data Explorer.
+- [x] Validate ingestion using Spark notebooks or Data Explorer.
 
 ### **Output: Bronze lakehouse with raw tables.**
 
