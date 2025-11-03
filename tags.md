@@ -11,6 +11,7 @@
 #db-design
 #system-databases
 #mssql-internals
+#mssql-management-tools
 #backup-restore
 #user-management
 #server-agent

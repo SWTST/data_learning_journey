@@ -1,8 +1,8 @@
 ```
-title: "Lecture 20 & 21: Overview of MSSQL Management Tools"
+title: "Lecture 20, 21 & 22: Overview of MSSQL Management Tools"
 date: 2025-10-27
 course: Microsoft SQL Server Database Administation Course
-tags: [#sql-basics, #mssql-internals, #db-design, #sql-performance]
+tags: [#sql-basics, #mssql-internals, #mssql-management-tools, #db-design, #sql-performance]
 summary: An Overview of MSSQL Management tools and how they are used
 ```
 
@@ -31,3 +31,13 @@ Some utilisations of SSMS are:
 - New Query / Query Parsing / Execution / Results and Execution plans.
 - Monitor SQL server using Activity Monitor / sp_who2 & sp_whoisactive / SQL Logs
 - DBA Admin tasks (Backup / Logins / Jobs / Maintenance plans)
+
+**Execution plans**
+
+You can view execution plans for queries by enabling them via the 'include actual execution plan' button in SSMS when running a query. You can then optimise your query using this plan. Another option is the 'estimated execution plan' which generates a plan without running the query.
+
+
+Also, with 'View > Object explorer details' You can see table level information like 'data used' and 'Row count' in a spreadsheet-style format. 
+
+
+
