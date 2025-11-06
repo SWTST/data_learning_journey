@@ -8,7 +8,7 @@
 - [x] Review: Notes + SQL tuning examples
 
 ## 🎃 October 2025
-- [ ] **Month Complete**
+- [x] **Month Complete**
 - [ ] SQL: Sections 7 (System DBs) + 8 (Deep Dive, start).
 - [x] Fabric: Build your first end-to-end pipeline (CSV → Lakehouse → query).
 - [x] Python: Codecademy: Learn Python 3 Course

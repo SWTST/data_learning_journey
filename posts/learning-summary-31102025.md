@@ -17,7 +17,7 @@ Conclusion:
 
 Intro
 
-The intention of this post is to share my current progress in my learning journey and perhaps help motivate others to start their own. I think its too easy to assume that you will understanding something given time and repetition, which is true, especially if you are consistently facing new venues for learning day-in and day-out. I'd say that for the majority of people, work can become repetitive and familiar leading to a reduction in opportunities to learn and therefore slowing or stagnating learning. Also, in a changing tech world, now more than ever, it is vital to stay relevant considering the rise of new technologies and how they integrate and elevate current solutions and ways of working.
+The intention of this post is to share my current progress in my learning journey and, hopefully, help inspire others to start their own. I think its too easy to assume that you will understand something given time and repetition, which is true, especially if you are consistently facing new venues for learning day-in and out. However, I'd say that for the majority of people, work can become repetitive and familiar leading to less opportunities to learn and therefore slows or stagnates learning. In a changing tech world, now more than ever, it is vital to stay relevant considering the rise of new technologies and how they integrate and elevate current solutions and ways of working.
 
 The topics I am covering in my current 6 month syllabus are below:
 
