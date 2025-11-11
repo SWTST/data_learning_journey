@@ -1,5 +1,5 @@
+## **Check Table Sizes**
 ```
--- Check Table Sizes
 SELECT 
     t.name AS TableName,
     s.name AS SchemaName,
@@ -30,8 +30,9 @@ ORDER BY
     TotalSpaceMB DESC, t.name
 ```
 
+## **Check which sessions are using the most tempDB**
+
 ```
--- Check which sessions are using the most tempDB
 sp_who2
 SELECT 
     session_id, 
@@ -41,8 +42,8 @@ GROUP BY session_id
 ORDER BY total_kb_used DESC;
 ```
 
+## **Update Job info dynamically based on dbo.sysjobs** 
 ```
--- Update Job info dynamically based on dbo.sysjobs
 DECLARE @name VARCHAR(200)
 
 DECLARE db_cursor CURSOR FOR 
@@ -66,9 +67,21 @@ END
 CLOSE db_cursor  
 DEALLOCATE db_cursor;
 ```
+
+## **Check all stored procedures for Object references**
 ```
--- Check all stored procedures for references
-CREATE PROCEDURE dbo.SHSP_databaseRefCheck @databaseRef VARCHAR(150)
+USE [master]
+GO
+
+/****** Object:  StoredProcedure [dbo].[SHSP_ObjectRefCheck]    Script Date: 11/11/2025 00:42:46 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+
+CREATE PROCEDURE [dbo].[SHSP_ObjectRefCheck] @ObjectRef VARCHAR(150)
 as
 
 BEGIN
@@ -92,7 +105,7 @@ BEGIN
 				FROM sys.sql_modules m
 				INNER JOIN sys.objects o ON m.object_id = o.object_id
 				WHERE o.type IN (''P'', ''V'', ''FN'', ''IF'', ''TF'')
-				AND m.definition LIKE ''%' + @databaseRef + '%''
+				AND m.definition LIKE ''%' + @ObjectRef + '%''
 
 			)
 	BEGIN
@@ -106,7 +119,7 @@ BEGIN
 	FROM sys.sql_modules m
 	INNER JOIN sys.objects o ON m.object_id = o.object_id
 	WHERE o.type IN (''P'', ''V'', ''FN'', ''IF'', ''TF'')
-	AND m.definition LIKE ''%' + @databaseRef + '%''
+	AND m.definition LIKE ''%' + @ObjectRef + '%''
 	END'
 
 	EXEC sp_executesql @sql
@@ -116,4 +129,36 @@ BEGIN
 CLOSE db_cursor
 DEALLOCATE db_cursor
 END
+GO
+```
+
+## **Change column collation for whole table** 
+```
+DECLARE @sql NVARCHAR(MAX);
+DECLARE @colName SYSNAME;
+DECLARE @dataType varchar(max);
+DECLARE @length varchar(max);
+
+DECLARE dbCursor CURSOR FOR
+    SELECT COLUMN_NAME, DATA_TYPE, CHARACTER_MAXIMUM_LENGTH
+    FROM INFORMATION_SCHEMA.COLUMNS
+    WHERE TABLE_NAME = 'AHT_React4TenancyImportData'
+	AND DATA_TYPE IN ('varchar','char'); -- Does not consider nvarchar, text, ntext
+										 -- String does not concatenate with MAX
+										 -- Use IF statement and CAST
+OPEN dbCursor;
+FETCH NEXT FROM dbCursor INTO @colName, @datatype, @length;
+
+WHILE @@FETCH_STATUS = 0
+BEGIN
+    SET @sql = 'ALTER TABLE [dbo].[AHT_React4TenancyImportData]
+                ALTER COLUMN [' + @colName + '] '+@datatype +'('+@length+') COLLATE Latin1_General_CI_AS';
+    PRINT @sql; -- For debugging
+    EXEC(@sql);
+
+    FETCH NEXT FROM dbCursor INTO @colName, @datatype, @length;
+END
+
+CLOSE dbCursor;
+DEALLOCATE dbCursor;
 ```
