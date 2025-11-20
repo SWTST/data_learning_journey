@@ -48,7 +48,7 @@ DECLARE @name VARCHAR(200)
 
 DECLARE db_cursor CURSOR FOR 
 SELECT name 
-FROM dbo.sysjobs
+FROM msdb.dbo.sysjobs
 OPEN db_cursor  
 FETCH NEXT FROM db_cursor INTO @name  
 WHILE @@FETCH_STATUS = 0  
