@@ -61,7 +61,7 @@ Adjust times to your life — the point is that the *slots are specific and writ
 - **Azure free tier** — spin up Azure SQL Database for hands-on labs
 - **John Savill's YouTube** — excellent Azure infrastructure explanations
 - **Data Exposed** (Microsoft Learn show) — short videos on SQL topics
-
+                         
 ---
 
 ## Phase 2: DP-700 — Fabric Data Engineer Associate
