@@ -1,17 +1,20 @@
-Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process -Force
-Start-Transcript -Path "C:\SQLStuff\Logs\JobFailureReport.log" -Append
-
+#Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process -Force
+Set-DbatoolsConfig -FullName sql.connection.trustcert -Value $true -Register
 Write-Output "JobFailureReport.ps1 started at $(Get-Date)"
 
 #Global Variables <Start>
 
-$CurrentDate = Get-Date -Format "dd/MM/yyyy"
-$Listeners = Get-DbaRegServer -SqlInstance servername -Group Production\Listeners
-$SingleInstances = Get-DbaRegServer -SqlInstance servername -Group Production\SingleInstances
+$SSAcreds = Get-Credential -UserName "" -Message 'Input SSA Credentials' 
+$WACreds = Get-Credential -Message 'Input WA Credentials'
 
+$cmsServer = 'ACUL021'
+$allServers = Get-DbaRegServer -SqlInstance $cmsServer -SqlCredential $WACreds
+
+<# SEND EMAIL FUNCTION
 $JobReport = @("\\servername\C$\SQLstuff\JobFailureReporting\Listeners.csv")
 $SingleInstancesReport = "\\servername\C$\SQLstuff\JobFailureReporting\SingleInstances.csv"
 $JobReport += $SingleInstancesReport
+#>
 
 $Query = "
 DECLARE @sql NVARCHAR(max)DECLARE @sql2 NVARCHAR(max)DECLARE @Listener NVARCHAR(max)
@@ -50,7 +53,7 @@ FROM
         FROM msdb.dbo.sysjobhistory T
         WHERE T.job_id = J.job_id
         AND step_id = 0
-            AND CAST(CONVERT(DATE, CAST(run_date AS CHAR(8))) AS DATE) 
+        AND CAST(CONVERT(DATE, CAST(run_date AS CHAR(8))) AS DATE) 
         BETWEEN @past_date AND @current_date
         ORDER BY instance_id DESC
     ) L
@@ -93,7 +96,7 @@ FROM
         FROM msdb.dbo.sysjobhistory T
         WHERE T.job_id = J.job_id
         AND step_id = 0
-            AND CAST(CONVERT(DATE, CAST(run_date AS CHAR(8))) AS DATE) 
+        AND CAST(CONVERT(DATE, CAST(run_date AS CHAR(8))) AS DATE) 
         BETWEEN @past_date AND @current_date
         ORDER BY instance_id DESC
     ) L
@@ -102,15 +105,44 @@ ORDER BY
 EXEC(@sql2)
 END
 "
+
+$results = @()
+
 #Global Variables <End>
 
-#Create CSV Report
-Invoke-DBAQuery -SqlInstance $Listeners -Query $Query | Export-Csv -Path \\PRI-SQL-15.southernhousinggroup.local\C$\SQLstuff\JobFailureReporting\Listeners.csv -NoTypeInformation -Encoding utf8
-Invoke-DBAQuery -SqlInstance $SingleInstances -Query $Query | Export-Csv -Path \\servername\C$\SQLstuff\JobFailureReporting\SingleInstances.csv -NoTypeInformation -Encoding utf8
+#Run report
+foreach($server in $allServers) {
+    try{
+    #Windows
+    Write-Host('Trying Windows Auth on $server.ServerName')
+    $results += Invoke-DBAQuery -SqlInstance $server.ServerName -Query $Query -SqlCredential $WACreds -EnableException
+    Write-Host('Windows Auth succeeded on $server.ServerName')
+    continue
+    } catch {
 
+    #SSA
+    Write-Warning "SSA failed on $($server.ServerName): $($_.Exception.Message)"
+
+        try {
+            Write-Host('Trying SSA on $server.ServerName')
+            $results += Invoke-DBAQuery -SqlInstance $server.ServerName -Query $Query -SqlCredential $SSAcreds -EnableException
+            Write-Host('SSA succeeded on $server.ServerName')
+        } catch {
+            Write-Warning "SSA failed on $($server.ServerName): $($_.Exception.Message)"
+        }
+    }
+}
+
+$results | Format-Table -AutoSize
+
+Write-Output "JobFailureReport.ps1 ended at $(Get-Date)"
+
+
+<#  SEND EMAIL FUNCTION
 #File Operations - Prep for HTML
 $CSVData = Import-Csv -Path "\\servername\C$\SQLstuff\JobFailureReporting\Listeners.csv"
 $CSVData2 = Import-Csv -Path "\\servername\C$\SQLstuff\JobFailureReporting\SingleInstances.csv"
+
 
 #Convert CSV Data to HTML
 If($CSVData.Count -gt 0) {
@@ -144,6 +176,7 @@ $body = @"
 </html>
 "@
 
+
 $sendMailMessageSplat = @{
     From = 'DBAteam'
     To = 'IT.servicedesk'
@@ -155,6 +188,5 @@ $sendMailMessageSplat = @{
 }
 
 Send-MailMessage @sendMailMessageSplat -BodyAsHtml
+#>
 
-Write-Output "JobFailureReport.ps1 ended at $(Get-Date)"
-Stop-Transcript
