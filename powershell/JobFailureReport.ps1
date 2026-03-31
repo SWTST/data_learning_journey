@@ -128,7 +128,7 @@ foreach($server in $allServers) {
             $results += Invoke-DBAQuery -SqlInstance $server.ServerName -Query $Query -SqlCredential $SSAcreds -EnableException
             Write-Host('SSA succeeded on $server.ServerName')
         } catch {
-            Write-Warning "SSA failed on $($server.ServerName): $($_.Exception.Message)"
+            Write-Warning "WA and SSA failed on $($server.ServerName): $($_.Exception.Message)"
         }
     }
 }
