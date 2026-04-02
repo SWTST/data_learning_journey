@@ -6,6 +6,8 @@ Set-DbatoolsConfig -FullName sql.connection.trustcert -Value $true -Register
 $myCreds = Get-Credential -UserName "" -Message "Input your SSA Login"
 $AUGoldServers = Get-DbaRegServer -SqlInstance acul021 -Group 'All Servers\AUGold' -ExcludeServerName "adc-uks-db1.augold.local"
 
+
+
 # List of target databases (UPPERCASE)
 $targetDatabases = @(
     'EXAMPLEDATA',
@@ -30,7 +32,7 @@ WHERE name IN ('$(($targetDatabases -join "','"))')
 $AllDatabases = Invoke-DbaQuery -SqlInstance $AUGoldServers.ServerName -SqlCredential $myCreds -Query $dbQuery
 
 # ---------------------------------------------------------
-# ACCESS RULES (single source of truth â€” all UPPERCASE)
+# ACCESS RULES (single source of truth — all UPPERCASE)
 # R = 1, RW = 2, RW + DDL = 3
 # ---------------------------------------------------------
 $AccessRules = @{
@@ -175,6 +177,7 @@ $securePwd = $userCreds.Password
 
 [int]$userGroup = Read-Host("Which user group will this login be a part of? `n  DCDev: 1`n  NetDev: 2`n  DBDev: 3`n  QA: 4`nPlease enter a number between 1 and 4.")
 
+
 function Assign-Access {
     param(
         [int]$level,
@@ -224,7 +227,7 @@ foreach ($server in $AUGoldServers) {
     $eligibleRows = $rowsForServer | Where-Object { $_.$levelProp -gt 0 }
 
     if (-not $eligibleRows) {
-        Write-Host "Skipping $serverShort â€” no $levelProp access required" -ForegroundColor DarkGray
+        Write-Host "Skipping $serverShort — no $levelProp access required" -ForegroundColor DarkGray
         continue
     }
 
