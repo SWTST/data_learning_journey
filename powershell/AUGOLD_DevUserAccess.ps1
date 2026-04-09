@@ -32,7 +32,7 @@ WHERE name IN ('$(($targetDatabases -join "','"))')
 $AllDatabases = Invoke-DbaQuery -SqlInstance $AUGoldServers.ServerName -SqlCredential $myCreds -Query $dbQuery
 
 # ---------------------------------------------------------
-# ACCESS RULES (single source of truth — all UPPERCASE)
+# ACCESS RULES (single source of truth ï¿½ all UPPERCASE)
 # R = 1, RW = 2, RW + DDL = 3
 # ---------------------------------------------------------
 $AccessRules = @{
@@ -227,7 +227,7 @@ foreach ($server in $AUGoldServers) {
     $eligibleRows = $rowsForServer | Where-Object { $_.$levelProp -gt 0 }
 
     if (-not $eligibleRows) {
-        Write-Host "Skipping $serverShort — no $levelProp access required" -ForegroundColor DarkGray
+        Write-Host "Skipping $serverShort ï¿½ no $levelProp access required" -ForegroundColor DarkGray
         continue
     }
 
