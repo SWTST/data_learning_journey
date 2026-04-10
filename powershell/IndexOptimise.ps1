@@ -7,7 +7,7 @@
 Set-DbatoolsConfig -FullName sql.connection.trustcert -Value $true -Register
 $allServers = Get-DbaRegisteredServer -SqlInstance acul021 -Group 'All Servers\Dev'
 
-$ssa     = Get-Credential -Message "Enter SSA login"
+$ssa = Get-Credential -Message "Enter SSA login"
 $windows = Get-Credential -Message "Enter Windows login"
 
 # Add these new variables for testing
@@ -21,7 +21,7 @@ ELSE
     SELECT
         @@SERVERNAME AS ServerName,
         CASE WHEN EXISTS (SELECT 1 FROM DBA.sys.procedures WHERE name = 'IndexOptimize') THEN 1 ELSE 0 END AS HasIndexSP,
-        CASE WHEN EXISTS (SELECT 1 FROM msdb.dbo.sysjobs WHERE name LIKE '%IndexOptimize%') THEN 1 ELSE 0 END AS HasIndexJob,
+        CASE WHEN EXISTS (SELECT 1 FROM msdb.dbo.sysjobs WHERE name LIKE '%IndexOptimi%e%') THEN 1 ELSE 0 END AS HasIndexJob,
         CASE WHEN EXISTS (SELECT 1 FROM DBA.sys.procedures WHERE name = 'DatabaseIntegrityCheck') THEN 1 ELSE 0 END AS HasDBCC,
         CASE WHEN EXISTS (SELECT 1 FROM msdb.dbo.sysjobs WHERE name LIKE '%DatabaseIntegrityCheck%') THEN 1 ELSE 0 END AS HasDBCCJob
 "@
@@ -44,7 +44,8 @@ foreach ($server in $allServers) {
     try {
         $r = Invoke-WithFallback -SqlInstance $server.ServerName -Query $legacyCheck
         if ($r) { $legacyResults.AddRange(@($r)) }
-    } catch {
+    }
+    catch {
         Write-Host "  Failed to query legacy jobs on $($server.ServerName): $($_.Exception.Message)" -ForegroundColor DarkYellow
     }
 }
@@ -56,7 +57,8 @@ function Invoke-WithFallback {
     param($SqlInstance, $Query)
     try {
         return Invoke-DbaQuery -SqlInstance $SqlInstance -SqlCredential $ssa -Query $Query -EnableException
-    } catch {
+    }
+    catch {
         Write-Host "  SSA failed on $SqlInstance, trying Windows: $($_.Exception.Message)" -ForegroundColor DarkYellow
         $result = Invoke-DbaQuery -SqlInstance $SqlInstance -SqlCredential $windows -Query $Query -EnableException
         Write-Host "  Windows succeeded on $SqlInstance" -ForegroundColor DarkYellow
@@ -83,14 +85,14 @@ function Get-OlaCommand {
     param($legacyParams)
     # Default Ola parameters
     $olaParams = @{
-        Databases = 'USER_DATABASES'
-        FragmentationLevel1 = 5
-        FragmentationLevel2 = 30
-        FragmentationMedium = 'INDEX_REORGANIZE,INDEX_REBUILD_ONLINE'
-        FragmentationHigh = 'INDEX_REBUILD_ONLINE'
-        UpdateStatistics = 'ALL'
+        Databases              = 'USER_DATABASES'
+        FragmentationLevel1    = 5
+        FragmentationLevel2    = 30
+        FragmentationMedium    = 'INDEX_REORGANIZE,INDEX_REBUILD_ONLINE'
+        FragmentationHigh      = 'INDEX_REBUILD_ONLINE'
+        UpdateStatistics       = 'ALL'
         OnlyModifiedStatistics = 'Y'
-        LogToTable = 'Y'
+        LogToTable             = 'Y'
     }
 
     # Mirror legacy settings where possible
@@ -121,7 +123,7 @@ function Remove-OlaMaintenanceSolution {
         
         # Drop jobs
         Get-DbaAgentJob -SqlInstance $SqlInstance -SqlCredential $Credential |
-        Where-Object { $_.Name -match 'IndexOptimize|DatabaseIntegrityCheck' } |
+        Where-Object { $_.Name -match 'IndexOptimi[sz]e|DatabaseIntegrityCheck' } |
         Remove-DbaAgentJob -SqlInstance $SqlInstance -SqlCredential $Credential -Confirm:$false
         
         # Drop procedures from DBA database (if it exists)
@@ -148,7 +150,8 @@ function Remove-OlaMaintenanceSolution {
         }
         
         Write-Host "  Removal completed on $SqlInstance" -ForegroundColor Green
-    } catch {
+    }
+    catch {
         Write-Host "  Removal failed on $SqlInstance - $($_.Exception.Message)" -ForegroundColor Red
     }
 }
@@ -160,7 +163,8 @@ foreach ($server in $allServers) {
     try {
         $r = Invoke-WithFallback -SqlInstance $server.ServerName -Query $spCheck
         $results.Add($r)
-    } catch {
+    }
+    catch {
         Write-Host "  FAILED to query $($server.ServerName): $($_.Exception.Message)" -ForegroundColor Red
     }
 }
@@ -169,12 +173,14 @@ if ($removeMode) {
     # In removal mode, process all servers or the single test server regardless of current object presence.
     $targets = if ($testServer) {
         $allServers | Where-Object { $_.ServerName -eq $testServer }
-    } else {
+    }
+    else {
         $allServers
     }
-} else {
+}
+else {
     # Servers needing deployment (missing SP or Job)
-    $targets = $results | Where-Object { $_.HasIndexSP -eq 0 -or $_.HasIndexJob -eq 0 -or $_.HasDBCC -eq 0 -or $_.HasDBCCJob -eq 0}
+    $targets = $results | Where-Object { $_.HasIndexSP -eq 0 -or $_.HasIndexJob -eq 0 -or $_.HasDBCC -eq 0 -or $_.HasDBCCJob -eq 0 }
     if ($testServer) {
         $targets = $targets | Where-Object { $_.ServerName -eq $testServer }
     }
@@ -185,13 +191,13 @@ $targets | Format-Table -AutoSize
 Write-Host "`n$($targets.Count) server(s) need stuff deployed`n" -ForegroundColor Cyan
 
 foreach ($t in $targets) {
-        $instance = $t.ServerName
-        $needsIndexSP  = $t.HasIndexSP  -eq 0
-        $needsIndexJob = $t.HasIndexJob -eq 0
-        $needsDBCC     = $t.HasDBCC     -eq 0
-        $needsDBCCJob  = $t.HasDBCCJob  -eq 0
-        $needsJobs     = $needsIndexJob -or $needsDBCCJob
-        $modeLabel = if ($removeMode) { 'Removing' } else { 'Deploying' }
+    $instance = $t.ServerName
+    $needsIndexSP = $t.HasIndexSP -eq 0
+    $needsIndexJob = $t.HasIndexJob -eq 0
+    $needsDBCC = $t.HasDBCC -eq 0
+    $needsDBCCJob = $t.HasDBCCJob -eq 0
+    $needsJobs = $needsIndexJob -or $needsDBCCJob
+    $modeLabel = if ($removeMode) { 'Removing' } else { 'Deploying' }
 
     Write-Host "$modeLabel to $instance (IndexSP:$needsIndexSP IndexJob:$needsIndexJob DBCC:$needsDBCC DBCCJob:$needsDBCCJob)" -ForegroundColor Yellow
     
@@ -200,7 +206,8 @@ foreach ($t in $targets) {
     try {
         $null = Invoke-DbaQuery -SqlInstance $instance -SqlCredential $ssa -Query "SELECT 1" -EnableException
         $cred = $ssa
-    } catch {
+    }
+    catch {
         $cred = $windows
     }
 
@@ -216,82 +223,175 @@ foreach ($t in $targets) {
 "@
 
         # Capture existing backup job details before installation
-        $backupJobs = Get-DbaAgentJob -SqlInstance $instance -SqlCredential $cred | Where-Object { $_.Name -like '(DBA) - DatabaseBackup*' }
+        # Check both (DBA) prefixed names and Ola default names in case of partial previous runs
+        $backupJobs = Get-DbaAgentJob -SqlInstance $instance -SqlCredential $cred |
+        Where-Object { $_.Name -like '*DatabaseBackup*' } |
+        Sort-Object Name -Unique
 
-        # Remove duplicate backup jobs from earlier runs and preserve the first instance by name
-        foreach ($jobGroup in $backupJobs | Group-Object Name) {
-            if ($jobGroup.Count -gt 1) {
-                $duplicates = $jobGroup.Group | Select-Object -Skip 1
-                foreach ($dup in $duplicates) {
-                    Remove-DbaAgentJob -SqlInstance $instance -SqlCredential $cred -InputObject $dup -Confirm:$false
-                    Write-Host "  Removed duplicate backup job '$($dup.Name)'" -ForegroundColor Yellow
-                }
+        # If both (DBA) and default-named versions exist for the same suffix, prefer the (DBA) one
+        $backupByType = @{}
+        foreach ($bj in $backupJobs) {
+            $suffix = $bj.Name -replace '^\(DBA\) - ', ''
+            if (-not $backupByType.ContainsKey($suffix) -or $bj.Name -like '(DBA) -*') {
+                $backupByType[$suffix] = $bj
             }
         }
+        $backupJobs = $backupByType.Values
 
-        $backupJobs = Get-DbaAgentJob -SqlInstance $instance -SqlCredential $cred | Where-Object { $_.Name -like '(DBA) - DatabaseBackup*' }
         $backupDetails = $backupJobs | ForEach-Object {
             $schedules = Invoke-DbaQuery -SqlInstance $instance -SqlCredential $cred -Query @"
                 USE msdb;
-                SELECT s.schedule_id, s.name, s.enabled, s.freq_type, s.freq_interval, s.freq_subday_type, s.freq_subday_interval,
-                       s.active_start_date, s.active_start_time, s.active_end_date, s.active_end_time
+                SELECT s.name, s.enabled, s.freq_type, s.freq_interval,
+                       s.freq_subday_type, s.freq_subday_interval,
+                       s.freq_relative_interval, s.freq_recurrence_factor,
+                       s.active_start_date, s.active_start_time,
+                       s.active_end_date, s.active_end_time
                 FROM dbo.sysjobs j
                 JOIN dbo.sysjobschedules js ON j.job_id = js.job_id
                 JOIN dbo.sysschedules s ON js.schedule_id = s.schedule_id
                 WHERE j.name = '$($_.Name)'
 "@ -EnableException
-            $scheduleIds = @($schedules | Select-Object -ExpandProperty schedule_id)
             $steps = Get-DbaAgentJobStep -SqlInstance $instance -SqlCredential $cred -Job $_.Name | Select-Object StepName, Subsystem, Database, Command, OnSuccessAction, OnFailAction, RetryAttempts, RetryInterval
+            # Normalise the saved name to (DBA) convention for restore later
+            $savedName = if ($_.Name -like '(DBA) -*') { $_.Name } else { "(DBA) - $($_.Name)" }
             [PSCustomObject]@{
-                Name = $_.Name
+                Name        = $savedName
                 Description = $_.Description
-                Enabled = $_.Enabled
-                Category = $_.Category
-                Owner = $_.Owner
-                ScheduleIds = $scheduleIds
-                Steps = $steps
+                Enabled     = $_.Enabled
+                Category    = $_.Category
+                Owner       = $_.Owner
+                Schedules   = @($schedules)
+                Steps       = $steps
             }
         }
 
-        # Install Ola's solution — do not install backup jobs so existing backup-to-URL jobs are preserved
-        $solutions = @()
-        if ($needsIndexSP -or $needsIndexJob) { $solutions += 'IndexOptimize' }
-        if ($needsDBCC -or $needsDBCCJob) { $solutions += 'IntegrityCheck' }
-        if (-not $solutions) { $solutions = 'IndexOptimize','IntegrityCheck' }
+        if ($backupDetails) {
+            Write-Host "  Captured settings for $(@($backupDetails).Count) backup job(s)" -ForegroundColor Cyan
+        }
 
+        # Remove ALL existing Ola jobs before install so we start clean (avoids name collisions)
+        $olaJobs = Get-DbaAgentJob -SqlInstance $instance -SqlCredential $cred | Where-Object {
+            $_.Name -match 'IndexOptimi[sz]e|DatabaseIntegrityCheck|DatabaseBackup|CommandLog Cleanup|Output File Cleanup|sp_delete_backuphistory|sp_purge_jobhistory' -or
+            $_.Name -match '^\(DBA\) - (IndexOptimi[sz]e|DatabaseIntegrityCheck|DatabaseBackup|CommandLog Cleanup|Output File Cleanup|sp_delete_backuphistory|sp_purge_jobhistory)'
+        }
+        foreach ($oj in $olaJobs) {
+            Remove-DbaAgentJob -SqlInstance $instance -SqlCredential $cred -InputObject $oj -Confirm:$false
+            Write-Host "  Removed existing job '$($oj.Name)' before reinstall" -ForegroundColor Yellow
+        }
+
+        # Install Ola's full solution — must use -Solution All when -InstallJobs is specified
+        # Backup job settings are captured above and restored after install
         Install-DbaMaintenanceSolution `
             -SqlInstance   $instance `
             -SqlCredential $cred `
             -Database      DBA `
-            -Solution      $solutions `
+            -Solution      All `
             -InstallJobs `
             -LogToTable `
             -ReplaceExisting `
             -EnableException
 
-        # Restore backup job settings and step commands
-        foreach ($detail in $backupDetails) {
-            $backupJob = Get-DbaAgentJob -SqlInstance $instance -SqlCredential $cred -Job $detail.Name
-            if ($backupJob) {
-                Set-DbaAgentJob -SqlInstance $instance -SqlCredential $cred -Job $detail.Name -Description $detail.Description -Enabled $detail.Enabled -Category $detail.Category -Owner $detail.Owner
-
-                if ($detail.ScheduleIds -and $detail.ScheduleIds.Count -gt 0) {
-                    Set-DbaAgentJob -SqlInstance $instance -SqlCredential $cred -Job $detail.Name -ScheduleId ([int[]]$detail.ScheduleIds)
-                }
-
-                foreach ($step in $detail.Steps) {
-                    if ($step -and $step.StepName) {
-                        Set-DbaAgentJobStep -SqlInstance $instance -SqlCredential $cred `
-                            -Job $detail.Name `
-                            -StepName $step.StepName `
-                            -Command $step.Command `
-                            -Database $step.Database `
-                            -Force
-                    }
-                }
-
-                Write-Host "  Restored settings for backup job '$($detail.Name)' on $instance" -ForegroundColor Green
+        # Rename Ola's default job names to (DBA) naming convention
+        $jobRenames = @{
+            'IndexOptimize - USER_DATABASES'            = '(DBA) - IndexOptimise - USER_DATABASES'
+            'DatabaseIntegrityCheck - USER_DATABASES'   = '(DBA) - DatabaseIntegrityCheck - USER_DATABASES'
+            'DatabaseIntegrityCheck - SYSTEM_DATABASES' = '(DBA) - DatabaseIntegrityCheck - SYSTEM_DATABASES'
+            'DatabaseBackup - USER_DATABASES - FULL'    = '(DBA) - DatabaseBackup - USER_DATABASES - FULL'
+            'DatabaseBackup - USER_DATABASES - DIFF'    = '(DBA) - DatabaseBackup - USER_DATABASES - DIFF'
+            'DatabaseBackup - USER_DATABASES - LOG'     = '(DBA) - DatabaseBackup - USER_DATABASES - LOG'
+            'DatabaseBackup - SYSTEM_DATABASES - FULL'  = '(DBA) - DatabaseBackup - SYSTEM_DATABASES - FULL'
+            'Output File Cleanup'                       = '(DBA) - Output File Cleanup'
+            'sp_delete_backuphistory'                   = '(DBA) - sp_delete_backuphistory'
+            'sp_purge_jobhistory'                       = '(DBA) - sp_purge_jobhistory'
+            'CommandLog Cleanup'                        = '(DBA) - CommandLog Cleanup'
+        }
+        foreach ($oldName in $jobRenames.Keys) {
+            $job = Get-DbaAgentJob -SqlInstance $instance -SqlCredential $cred | Where-Object { $_.Name -eq $oldName }
+            if ($job) {
+                $newName = $jobRenames[$oldName]
+                Invoke-DbaQuery -SqlInstance $instance -SqlCredential $cred -Query "EXEC msdb.dbo.sp_update_job @job_name = N'$oldName', @new_name = N'$newName'" -EnableException
+                Write-Host "  Renamed job '$oldName' -> '$newName'" -ForegroundColor Green
             }
+        }
+
+        # Restore backup job settings onto the now-renamed (DBA) jobs
+        foreach ($detail in $backupDetails) {
+            $jobName = $detail.Name  # already in (DBA) convention from capture step
+            $backupJob = Get-DbaAgentJob -SqlInstance $instance -SqlCredential $cred -Job $jobName
+
+            if (-not $backupJob) {
+                Write-Host "  WARNING: Could not find backup job '$jobName' after install on $instance" -ForegroundColor Red
+                continue
+            }
+
+            # -Enabled is a switch param, so use -Enabled or -Disabled conditionally
+            if ($detail.Enabled) {
+                Set-DbaAgentJob -SqlInstance $instance -SqlCredential $cred -Job $jobName `
+                    -Description $detail.Description -Enabled `
+                    -Category $detail.Category -Owner $detail.Owner
+            }
+            else {
+                Set-DbaAgentJob -SqlInstance $instance -SqlCredential $cred -Job $jobName `
+                    -Description $detail.Description -Disabled `
+                    -Category $detail.Category -Owner $detail.Owner
+            }
+
+            # Replace Ola's default schedule with the originals
+            if ($detail.Schedules -and @($detail.Schedules).Count -gt 0) {
+                # Remove the default schedules Ola just created
+                $currentSchedules = Invoke-DbaQuery -SqlInstance $instance -SqlCredential $cred -Query @"
+                    SELECT s.schedule_id
+                    FROM msdb.dbo.sysjobs j
+                    JOIN msdb.dbo.sysjobschedules js ON j.job_id = js.job_id
+                    JOIN msdb.dbo.sysschedules s ON js.schedule_id = s.schedule_id
+                    WHERE j.name = N'$jobName'
+"@ -EnableException
+                foreach ($cs in $currentSchedules) {
+                    Invoke-DbaQuery -SqlInstance $instance -SqlCredential $cred -Query "EXEC msdb.dbo.sp_delete_schedule @schedule_id = $($cs.schedule_id), @force_delete = 1" -EnableException
+                }
+
+                # Recreate the original schedules
+                foreach ($sched in $detail.Schedules) {
+                    if (-not $sched) { continue }
+                    Invoke-DbaQuery -SqlInstance $instance -SqlCredential $cred -Query @"
+                        EXEC msdb.dbo.sp_add_jobschedule
+                            @job_name = N'$jobName',
+                            @name = N'$($sched.name)',
+                            @enabled = $($sched.enabled),
+                            @freq_type = $($sched.freq_type),
+                            @freq_interval = $($sched.freq_interval),
+                            @freq_subday_type = $($sched.freq_subday_type),
+                            @freq_subday_interval = $($sched.freq_subday_interval),
+                            @freq_relative_interval = $($sched.freq_relative_interval),
+                            @freq_recurrence_factor = $($sched.freq_recurrence_factor),
+                            @active_start_date = $($sched.active_start_date),
+                            @active_start_time = $($sched.active_start_time),
+                            @active_end_date = $($sched.active_end_date),
+                            @active_end_time = $($sched.active_end_time)
+"@ -EnableException
+                }
+            }
+
+            # Restore step commands — match by position since names may differ after reinstall
+            $currentSteps = @(Get-DbaAgentJobStep -SqlInstance $instance -SqlCredential $cred -Job $jobName)
+            $savedSteps = @($detail.Steps)
+            for ($i = 0; $i -lt $savedSteps.Count; $i++) {
+                $savedStep = $savedSteps[$i]
+                $targetStep = if ($i -lt $currentSteps.Count) { $currentSteps[$i] } else { $null }
+                if ($savedStep -and $targetStep) {
+                    # Get step name — dbatools uses Name, Select-Object may have StepName
+                    $stepName = if ($targetStep.Name) { $targetStep.Name } else { $targetStep.StepName }
+                    Set-DbaAgentJobStep -SqlInstance $instance -SqlCredential $cred `
+                        -Job $jobName `
+                        -StepName $stepName `
+                        -Command $savedStep.Command `
+                        -Database $savedStep.Database `
+                        -Force
+                    Write-Host "    Restored step '$stepName' command" -ForegroundColor DarkCyan
+                }
+            }
+
+            Write-Host "  Restored settings for backup job '$jobName' on $instance" -ForegroundColor Green
         }
 
         Write-Host "  Deployed to $instance" -ForegroundColor Green
@@ -314,12 +414,12 @@ foreach ($t in $targets) {
         }
 
         Get-DbaAgentJob -SqlInstance $instance -SqlCredential $cred |
-        Where-Object { $_.Name -match 'IndexOptimize|DatabaseIntegrityCheck' } |
+        Where-Object { $_.Name -match 'IndexOptimi[sz]e|DatabaseIntegrityCheck' } |
         Set-DbaAgentJob -Disabled
 
         # Configure IndexOptimize job with mirrored or default settings
         $indexJob = Get-DbaAgentJob -SqlInstance $instance -SqlCredential $cred |
-                    Where-Object Name -match 'IndexOptimize - USER_DATABASES'
+        Where-Object Name -match 'IndexOptimi[sz]e - USER_DATABASES'
         if ($indexJob) {
             $commandToUse = if ($olaCommand) { $olaCommand } else {
                 @"
@@ -335,13 +435,24 @@ EXEC dbo.IndexOptimize
 "@
             }
 
-            $indexStepName = (Get-DbaAgentJobStep -SqlInstance $instance -SqlCredential $cred -Job $indexJob.Name | Select-Object -First 1 -ExpandProperty StepName)
-            if (-not $indexStepName) { $indexStepName = 'Index Maintenance' }
+            $indexStep = Get-DbaAgentJobStep -SqlInstance $instance -SqlCredential $cred -Job $indexJob.Name | Select-Object -First 1
+            $indexStepName = if ($indexStep.Name) { $indexStep.Name } elseif ($indexStep.StepName) { $indexStep.StepName } else { $null }
 
-            Set-DbaAgentJobStep -SqlInstance $instance -SqlCredential $cred `
-                -Job $indexJob.Name `
-                -StepName $indexStepName `
-                -Command $commandToUse
+            if ($indexStepName) {
+                Set-DbaAgentJobStep -SqlInstance $instance -SqlCredential $cred `
+                    -Job $indexJob.Name `
+                    -StepName $indexStepName `
+                    -Command $commandToUse
+            }
+            else {
+                # No existing step found — create one
+                Set-DbaAgentJobStep -SqlInstance $instance -SqlCredential $cred `
+                    -Job $indexJob.Name `
+                    -StepName 'IndexOptimize - USER_DATABASES' `
+                    -Command $commandToUse `
+                    -Database DBA `
+                    -Force
+            }
             Write-Host "  Configured IndexOptimize job on $instance" -ForegroundColor Green
         }
 
@@ -356,9 +467,10 @@ EXEC dbo.IndexOptimize
         }
         #>
 
-    } catch {
+    }
+    catch {
         Write-Host "FAILED on $instance : $($_.Exception.Message)" -ForegroundColor Red
     }
 
-    }
+}
 
