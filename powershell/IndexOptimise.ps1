@@ -32,6 +32,7 @@ ELSE
         @@SERVERNAME AS ServerName,
         CASE WHEN EXISTS (SELECT 1 FROM DBA.sys.procedures WHERE name = 'IndexOptimize') THEN 1 ELSE 0 END AS HasIndexSP,
         CASE WHEN EXISTS (SELECT 1 FROM msdb.dbo.sysjobs WHERE name LIKE '%IndexOptimi%e%') THEN 1 ELSE 0 END AS HasIndexJob,
+        CASE WHEN EXISTS (SELECT 1 FROM msdb.dbo.sysjobs WHERE name LIKE '%IndexOptimi%e%') THEN 1 ELSE 0 END AS HasIndexJob,
         CASE WHEN EXISTS (SELECT 1 FROM DBA.sys.procedures WHERE name = 'DatabaseIntegrityCheck') THEN 1 ELSE 0 END AS HasDBCC,
         CASE WHEN EXISTS (SELECT 1 FROM msdb.dbo.sysjobs WHERE name LIKE '%DatabaseIntegrityCheck%') THEN 1 ELSE 0 END AS HasDBCCJob
 "@
@@ -58,7 +59,8 @@ foreach ($server in $allServers) {
     try {
         $r = Invoke-WithFallback -SqlInstance $server.ServerName -Query $legacyCheck
         if ($r) { $legacyResults.AddRange(@($r)) }
-    } catch {
+    }
+    catch {
         Write-Host "  Failed to query legacy jobs on $($server.ServerName): $($_.Exception.Message)" -ForegroundColor DarkYellow
     }
 }
@@ -74,7 +76,8 @@ function Invoke-WithFallback {
     param($SqlInstance, $Query)
     try {
         return Invoke-DbaQuery -SqlInstance $SqlInstance -SqlCredential $ssa -Query $Query -EnableException
-    } catch {
+    }
+    catch {
         Write-Host "  SSA failed on $SqlInstance, trying Windows: $($_.Exception.Message)" -ForegroundColor DarkYellow
         $result = Invoke-DbaQuery -SqlInstance $SqlInstance -SqlCredential $windows -Query $Query -EnableException
         Write-Host "  Windows succeeded on $SqlInstance" -ForegroundColor DarkYellow
@@ -111,14 +114,14 @@ function Get-OlaCommand {
     param($legacyParams)
     # Default Ola parameters
     $olaParams = @{
-        Databases = 'USER_DATABASES'
-        FragmentationLevel1 = 5
-        FragmentationLevel2 = 30
-        FragmentationMedium = 'INDEX_REORGANIZE,INDEX_REBUILD_ONLINE'
-        FragmentationHigh = 'INDEX_REBUILD_ONLINE'
-        UpdateStatistics = 'ALL'
+        Databases              = 'USER_DATABASES'
+        FragmentationLevel1    = 5
+        FragmentationLevel2    = 30
+        FragmentationMedium    = 'INDEX_REORGANIZE,INDEX_REBUILD_ONLINE'
+        FragmentationHigh      = 'INDEX_REBUILD_ONLINE'
+        UpdateStatistics       = 'ALL'
         OnlyModifiedStatistics = 'Y'
-        LogToTable = 'Y'
+        LogToTable             = 'Y'
     }
 
     # Mirror legacy settings where possible
@@ -156,6 +159,7 @@ function Remove-OlaMaintenanceSolution {
         # Drop SQL Agent jobs related to Ola maintenance
         Get-DbaAgentJob -SqlInstance $SqlInstance -SqlCredential $Credential |
         Where-Object { $_.Name -match 'IndexOptimi[sz]e|DatabaseIntegrityCheck' } |
+        Where-Object { $_.Name -match 'IndexOptimi[sz]e|DatabaseIntegrityCheck' } |
         Remove-DbaAgentJob -SqlInstance $SqlInstance -SqlCredential $Credential -Confirm:$false
         
         # Drop procedures from DBA database (if it exists)
@@ -182,7 +186,8 @@ function Remove-OlaMaintenanceSolution {
         }
         
         Write-Host "  Removal completed on $SqlInstance" -ForegroundColor Green
-    } catch {
+    }
+    catch {
         Write-Host "  Removal failed on $SqlInstance - $($_.Exception.Message)" -ForegroundColor Red
     }
 }
@@ -197,7 +202,8 @@ foreach ($server in $allServers) {
     try {
         $r = Invoke-WithFallback -SqlInstance $server.ServerName -Query $spCheck
         $results.Add($r)
-    } catch {
+    }
+    catch {
         Write-Host "  FAILED to query $($server.ServerName): $($_.Exception.Message)" -ForegroundColor Red
     }
 }
@@ -209,12 +215,14 @@ if ($removeMode) {
     # In removal mode, process all servers or the single test server regardless of current object presence.
     $targets = if ($testServer) {
         $allServers | Where-Object { $_.ServerName -eq $testServer }
-    } else {
+    }
+    else {
         $allServers
     }
-} else {
+}
+else {
     # Servers needing deployment (missing SP or Job)
-    $targets = $results | Where-Object { $_.HasIndexSP -eq 0 -or $_.HasIndexJob -eq 0 -or $_.HasDBCC -eq 0 -or $_.HasDBCCJob -eq 0}
+    $targets = $results | Where-Object { $_.HasIndexSP -eq 0 -or $_.HasIndexJob -eq 0 -or $_.HasDBCC -eq 0 -or $_.HasDBCCJob -eq 0 }
     if ($testServer) {
         $targets = $targets | Where-Object { $_.ServerName -eq $testServer }
     }
@@ -228,13 +236,13 @@ Write-Host "`n$($targets.Count) server(s) need stuff deployed`n" -ForegroundColo
 # Main Deployment Loop: Process each target server
 # ========================================================================
 foreach ($t in $targets) {
-        $instance = $t.ServerName
-        $needsIndexSP  = $t.HasIndexSP  -eq 0
-        $needsIndexJob = $t.HasIndexJob -eq 0
-        $needsDBCC     = $t.HasDBCC     -eq 0
-        $needsDBCCJob  = $t.HasDBCCJob  -eq 0
-        $needsJobs     = $needsIndexJob -or $needsDBCCJob
-        $modeLabel = if ($removeMode) { 'Removing' } else { 'Deploying' }
+    $instance = $t.ServerName
+    $needsIndexSP = $t.HasIndexSP -eq 0
+    $needsIndexJob = $t.HasIndexJob -eq 0
+    $needsDBCC = $t.HasDBCC -eq 0
+    $needsDBCCJob = $t.HasDBCCJob -eq 0
+    $needsJobs = $needsIndexJob -or $needsDBCCJob
+    $modeLabel = if ($removeMode) { 'Removing' } else { 'Deploying' }
 
     Write-Host "$modeLabel to $instance (IndexSP:$needsIndexSP IndexJob:$needsIndexJob DBCC:$needsDBCC DBCCJob:$needsDBCCJob)" -ForegroundColor Yellow
     
@@ -243,7 +251,8 @@ foreach ($t in $targets) {
     try {
         $null = Invoke-DbaQuery -SqlInstance $instance -SqlCredential $ssa -Query "SELECT 1" -EnableException
         $cred = $ssa
-    } catch {
+    }
+    catch {
         $cred = $windows
     }
 
@@ -289,6 +298,11 @@ foreach ($t in $targets) {
                        s.freq_relative_interval, s.freq_recurrence_factor,
                        s.active_start_date, s.active_start_time,
                        s.active_end_date, s.active_end_time
+                SELECT s.name, s.enabled, s.freq_type, s.freq_interval,
+                       s.freq_subday_type, s.freq_subday_interval,
+                       s.freq_relative_interval, s.freq_recurrence_factor,
+                       s.active_start_date, s.active_start_time,
+                       s.active_end_date, s.active_end_time
                 FROM dbo.sysjobs j
                 JOIN dbo.sysjobschedules js ON j.job_id = js.job_id
                 JOIN dbo.sysschedules s ON js.schedule_id = s.schedule_id
@@ -299,7 +313,13 @@ foreach ($t in $targets) {
             $savedName = if ($_.Name -like '(DBA) -*') { $_.Name } else { "(DBA) - $($_.Name)" }
             [PSCustomObject]@{
                 Name        = $savedName
+                Name        = $savedName
                 Description = $_.Description
+                Enabled     = $_.Enabled
+                Category    = $_.Category
+                Owner       = $_.Owner
+                Schedules   = @($schedules)
+                Steps       = $steps
                 Enabled     = $_.Enabled
                 Category    = $_.Category
                 Owner       = $_.Owner
@@ -329,6 +349,7 @@ foreach ($t in $targets) {
             -SqlInstance   $instance `
             -SqlCredential $cred `
             -Database      DBA `
+            -Solution      All `
             -Solution      All `
             -InstallJobs `
             -LogToTable `
@@ -503,6 +524,7 @@ foreach ($t in $targets) {
         # Disable new maintenance jobs by default (they'll be enabled/configured below)
         Get-DbaAgentJob -SqlInstance $instance -SqlCredential $cred |
         Where-Object { $_.Name -match 'IndexOptimi[sz]e|DatabaseIntegrityCheck' } |
+        Where-Object { $_.Name -match 'IndexOptimi[sz]e|DatabaseIntegrityCheck' } |
         Set-DbaAgentJob -Disabled
 
         # Configure IndexOptimize job with mirrored settings or default parameters
@@ -524,6 +546,8 @@ EXEC dbo.IndexOptimize
 "@
             }
 
+            $indexStep = Get-DbaAgentJobStep -SqlInstance $instance -SqlCredential $cred -Job $indexJob.Name | Select-Object -First 1
+            $indexStepName = if ($indexStep.Name) { $indexStep.Name } elseif ($indexStep.StepName) { $indexStep.StepName } else { $null }
             $indexStep = Get-DbaAgentJobStep -SqlInstance $instance -SqlCredential $cred -Job $indexJob.Name | Select-Object -First 1
             $indexStepName = if ($indexStep.Name) { $indexStep.Name } elseif ($indexStep.StepName) { $indexStep.StepName } else { $null }
 
@@ -555,7 +579,8 @@ EXEC dbo.IndexOptimize
         }
         #>
 
-    } catch {
+    }
+    catch {
         Write-Host "FAILED on $instance : $($_.Exception.Message)" -ForegroundColor Red
     }
 
