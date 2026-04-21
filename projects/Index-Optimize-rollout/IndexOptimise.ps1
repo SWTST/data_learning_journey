@@ -18,7 +18,7 @@
 [CmdletBinding()]
 param(
     [Parameter(Mandatory)][string]$ServerName,
-    [Parameter(Mandatory)][ValidateSet('Discover','InstallPrereqs','Deploy','Cutover')][string]$Phase,
+    [Parameter(Mandatory)][ValidateSet('Discover', 'InstallPrereqs', 'Deploy', 'Cutover')][string]$Phase,
     [int]$TimeLimitSeconds = 25200,
     [System.Management.Automation.PSCredential]$SsaCredential,
     [System.Management.Automation.PSCredential]$WindowsCredential
@@ -29,7 +29,7 @@ Set-DbatoolsConfig -FullName sql.connection.trustcert -Value $true -Register | O
 # --------------------------------------------------------------------
 # Constants
 # --------------------------------------------------------------------
-$NewJobName    = '(DBA) - IndexOptimise - USER_DATABASES'
+$NewJobName = '(DBA) - IndexOptimise - USER_DATABASES'
 $LegacyJobName = '(DBA) - Optimisation'
 
 # Documented defaults (brief §8)
@@ -69,7 +69,7 @@ $RunTs = Get-Date
 # --------------------------------------------------------------------
 # Credentials (prompt only if not supplied)
 # --------------------------------------------------------------------
-if (-not $SsaCredential)     { $SsaCredential     = Get-Credential -Message 'Enter SSA login' }
+if (-not $SsaCredential) { $SsaCredential = Get-Credential -Message 'Enter SSA login' }
 if (-not $WindowsCredential) { $WindowsCredential = Get-Credential -Message 'Enter Windows login' }
 
 function Get-ResolvedCredential {
@@ -77,7 +77,8 @@ function Get-ResolvedCredential {
     try {
         $null = Invoke-DbaQuery -SqlInstance $SqlInstance -SqlCredential $SsaCredential -Query 'SELECT 1' -EnableException
         return $SsaCredential
-    } catch {
+    }
+    catch {
         return $WindowsCredential
     }
 }
@@ -130,7 +131,7 @@ IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_tblIndexOptimizeRollou
 function SqlLit {
     param($Value)
     if ($null -eq $Value) { return 'NULL' }
-    return "N'" + ($Value.ToString() -replace "'","''") + "'"
+    return "N'" + ($Value.ToString() -replace "'", "''") + "'"
 }
 
 function Write-Audit {
@@ -246,7 +247,7 @@ USE DBA;
 SELECT ConfigName, DatabaseName, CAST(DatabaseConfigValue AS NVARCHAR(100)) AS DatabaseConfigValue
 FROM dbo.tblDatabaseConfig;
 "@
-    return ,(Invoke-Sql -SqlInstance $SqlInstance -Credential $Credential -Query $sql)
+    return , (Invoke-Sql -SqlInstance $SqlInstance -Credential $Credential -Query $sql)
 }
 
 # ConfigName values that Build-OlaParams knows how to map. Anything outside
@@ -271,9 +272,9 @@ function Parse-LegacyStepParams {
     foreach ($m in $rx.Matches($Command)) {
         $k = $m.Groups[1].Value
         $v = $m.Groups[2].Value
-        if ($v -eq 'NULL')                 { $v = $null }
-        elseif ($v -match '^-?\d+$')       { $v = [int]$v }
-        else                               { $v = $v.Substring(1, $v.Length-2) -replace "''","'" }
+        if ($v -eq 'NULL') { $v = $null }
+        elseif ($v -match '^-?\d+$') { $v = [int]$v }
+        else { $v = $v.Substring(1, $v.Length - 2) -replace "''", "'" }
         $params[$k] = $v
     }
     return $params
@@ -314,7 +315,7 @@ function Build-OlaParams {
                 }
                 'REBUILD ONLINE' {
                     if ($row.DatabaseConfigValue -eq '0') {
-                        $ola.FragmentationHigh   = @{
+                        $ola.FragmentationHigh = @{
                             Value = 'INDEX_REBUILD_OFFLINE'; Source = 'Legacy'
                             Notes = 'REBUILD ONLINE=0 disables online rebuilds'
                         }
@@ -333,11 +334,11 @@ function Build-OlaParams {
         # Treat OPTIMISE EXCLUDE and STATS EXCLUDE the same (Ola cannot split index vs stats per db).
         $excludedDbs = @(
             $LegacyConfigRows |
-                Where-Object {
-                    ($_.ConfigName -eq 'OPTIMISE EXCLUDE' -or $_.ConfigName -eq 'STATS EXCLUDE') -and
-                    ($_.DatabaseConfigValue.ToString().Trim() -eq '1')
-                } |
-                Select-Object -ExpandProperty DatabaseName -Unique
+            Where-Object {
+                ($_.ConfigName -eq 'OPTIMISE EXCLUDE' -or $_.ConfigName -eq 'STATS EXCLUDE') -and
+                ($_.DatabaseConfigValue.ToString().Trim() -eq '1')
+            } |
+            Select-Object -ExpandProperty DatabaseName -Unique
         )
         if ($excludedDbs.Count -gt 0) {
             $list = @('USER_DATABASES') + ($excludedDbs | ForEach-Object { "-$_" })
@@ -383,19 +384,19 @@ function Build-OlaParams {
 function Build-IndexOptimizeCommand {
     param($OlaMap)
     $orderedKeys = @(
-        'Databases','FragmentationLevel1','FragmentationLevel2',
-        'FragmentationLow','FragmentationMedium','FragmentationHigh',
-        'PageCountLevel','UpdateStatistics','OnlyModifiedStatistics',
-        'LogToTable','TimeLimit'
+        'Databases', 'FragmentationLevel1', 'FragmentationLevel2',
+        'FragmentationLow', 'FragmentationMedium', 'FragmentationHigh',
+        'PageCountLevel', 'UpdateStatistics', 'OnlyModifiedStatistics',
+        'LogToTable', 'TimeLimit'
     )
     $lines = @('EXEC dbo.IndexOptimize')
     for ($i = 0; $i -lt $orderedKeys.Count; $i++) {
         $k = $orderedKeys[$i]
         $v = $OlaMap[$k].Value
         $rendered =
-            if ($null -eq $v)                  { 'NULL' }
-            elseif ($v -is [int])              { "$v" }
-            else                               { "'" + ($v.ToString() -replace "'","''") + "'" }
+        if ($null -eq $v) { 'NULL' }
+        elseif ($v -is [int]) { "$v" }
+        else { "'" + ($v.ToString() -replace "'", "''") + "'" }
         $prefix = if ($i -eq 0) { '  ' } else { ', ' }
         $lines += "$prefix@$k = $rendered"
     }
@@ -475,12 +476,12 @@ function Invoke-Discover {
     Write-Audit -SqlInstance $SqlInstance -Credential $Credential -Finding 'Ola.IndexOptimize'   -FindingValue $olaState.HasIndexOptimize
 
     # Full capture of legacy job (settings, steps, schedules)
-    $legacySteps     = Get-JobSteps     -SqlInstance $SqlInstance -Credential $Credential -JobName $LegacyJobName
+    $legacySteps = Get-JobSteps     -SqlInstance $SqlInstance -Credential $Credential -JobName $LegacyJobName
     $legacySchedules = Get-JobSchedules -SqlInstance $SqlInstance -Credential $Credential -JobName $LegacyJobName
     Write-JobAudit -SqlInstance $SqlInstance -Credential $Credential -Prefix 'Legacy' -Steps $legacySteps -Schedules $legacySchedules
 
     # Full capture of the new job if one already exists on this server
-    $newSteps     = Get-JobSteps     -SqlInstance $SqlInstance -Credential $Credential -JobName $NewJobName
+    $newSteps = Get-JobSteps     -SqlInstance $SqlInstance -Credential $Credential -JobName $NewJobName
     $newSchedules = Get-JobSchedules -SqlInstance $SqlInstance -Credential $Credential -JobName $NewJobName
     Write-JobAudit -SqlInstance $SqlInstance -Credential $Credential -Prefix 'New' -Steps $newSteps -Schedules $newSchedules
 
@@ -489,12 +490,13 @@ function Invoke-Discover {
     if ($null -eq $cfg) {
         Write-Audit -SqlInstance $SqlInstance -Credential $Credential -Finding 'Legacy.ConfigTable' -FindingValue 'Missing' `
             -Notes 'DBA.dbo.tblDatabaseConfig not found; mapping will fall through to defaults.'
-    } else {
+    }
+    else {
         Write-Audit -SqlInstance $SqlInstance -Credential $Credential -Finding 'Legacy.ConfigTable' -FindingValue 'Present' `
             -Notes "Rows: $(@($cfg).Count)"
         foreach ($c in $cfg) {
-            $tag     = if ($c.DatabaseName) { "$($c.ConfigName)[$($c.DatabaseName)]" } else { $c.ConfigName }
-            $source  = if ($KnownConfigNames -contains $c.ConfigName) { 'Mapped' } else { 'Unmapped' }
+            $tag = if ($c.DatabaseName) { "$($c.ConfigName)[$($c.DatabaseName)]" } else { $c.ConfigName }
+            $source = if ($KnownConfigNames -contains $c.ConfigName) { 'Mapped' } else { 'Unmapped' }
             Write-Audit -SqlInstance $SqlInstance -Credential $Credential `
                 -Finding "Legacy.Config.$tag" -FindingValue $c.DatabaseConfigValue -Source $source
         }
@@ -545,16 +547,16 @@ function Invoke-Deploy {
         throw "Ola IndexOptimize procedure is missing on $SqlInstance. Run -Phase InstallPrereqs first."
     }
 
-    $legacySteps  = Get-JobSteps     -SqlInstance $SqlInstance -Credential $Credential -JobName $LegacyJobName
+    $legacySteps = Get-JobSteps     -SqlInstance $SqlInstance -Credential $Credential -JobName $LegacyJobName
     $legacyConfig = Get-LegacyConfig -SqlInstance $SqlInstance -Credential $Credential
-    $legacySched  = Get-JobSchedules -SqlInstance $SqlInstance -Credential $Credential -JobName $LegacyJobName |
-                    Select-Object -First 1
+    $legacySched = Get-JobSchedules -SqlInstance $SqlInstance -Credential $Credential -JobName $LegacyJobName |
+    Select-Object -First 1
 
     $olaMap = Build-OlaParams -LegacyJobSteps $legacySteps -LegacyConfigRows $legacyConfig
 
     foreach ($k in $olaMap.Keys) {
         $entry = $olaMap[$k]
-        $val   = if ($null -eq $entry.Value) { $null } else { "$($entry.Value)" }
+        $val = if ($null -eq $entry.Value) { $null } else { "$($entry.Value)" }
         Write-Audit -SqlInstance $SqlInstance -Credential $Credential `
             -Finding "Deploy.Param.$k" -FindingValue $val -Source $entry.Source -Notes $entry.Notes
     }
@@ -596,7 +598,8 @@ EXEC msdb.dbo.sp_delete_job @job_name = N'$(($row.name) -replace "'","''")', @de
             Active_Start_Time      = [int]$legacySched.active_start_time
             Active_End_Time        = [int]$legacySched.active_end_time
         }
-    } else {
+    }
+    else {
         $sched = @{
             Source                 = 'Default'
             Name                   = $DefaultSchedule.Name
@@ -618,8 +621,8 @@ EXEC msdb.dbo.sp_delete_job @job_name = N'$(($row.name) -replace "'","''")', @de
     Write-Audit -SqlInstance $SqlInstance -Credential $Credential -Finding 'Deploy.Schedule.FreqType' -FindingValue $sched.Freq_Type
     Write-Audit -SqlInstance $SqlInstance -Credential $Credential -Finding 'Deploy.Schedule.StartTime' -FindingValue $sched.Active_Start_Time
 
-    $escCmd      = $command -replace "'","''"
-    $escSchedName = $sched.Name -replace "'","''"
+    $escCmd = $command -replace "'", "''"
+    $escSchedName = $sched.Name -replace "'", "''"
 
     $createSql = @"
 USE msdb;
@@ -714,10 +717,10 @@ $cred = Get-ResolvedCredential -SqlInstance $ServerName
 Ensure-AuditTable -SqlInstance $ServerName -Credential $cred
 
 switch ($Phase) {
-    'Discover'       { Invoke-Discover       -SqlInstance $ServerName -Credential $cred }
+    'Discover' { Invoke-Discover       -SqlInstance $ServerName -Credential $cred }
     'InstallPrereqs' { Invoke-InstallPrereqs -SqlInstance $ServerName -Credential $cred }
-    'Deploy'         { Invoke-Deploy         -SqlInstance $ServerName -Credential $cred }
-    'Cutover'        { Invoke-Cutover        -SqlInstance $ServerName -Credential $cred }
+    'Deploy' { Invoke-Deploy         -SqlInstance $ServerName -Credential $cred }
+    'Cutover' { Invoke-Cutover        -SqlInstance $ServerName -Credential $cred }
 }
 
 Write-Host "`nDone. RunId=$RunId" -ForegroundColor Cyan
