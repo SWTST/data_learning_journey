@@ -6,7 +6,6 @@ __pycache__/
 *.pyc
 
 # Data files
-*.csv
 *.parquet
 *.db
 *.bak
