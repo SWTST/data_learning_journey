@@ -621,6 +621,35 @@ EXEC msdb.dbo.sp_delete_job @job_name = N'$(($row.name) -replace "'","''")', @de
     Write-Audit -SqlInstance $SqlInstance -Credential $Credential -Finding 'Deploy.Schedule.FreqType' -FindingValue $sched.Freq_Type
     Write-Audit -SqlInstance $SqlInstance -Credential $Credential -Finding 'Deploy.Schedule.StartTime' -FindingValue $sched.Active_Start_Time
 
+    # Review flag: any time a mappable parameter or the schedule falls back to
+    # documented defaults, emit a single summary 'Warning' row so the Inventory
+    # Server can list servers that need human review. Does not block Deploy.
+    $hasLegacyJob = @($legacySteps).Count -gt 0
+    $mappableOla = @(
+        'FragmentationLevel1', 'FragmentationLevel2', 'PageCountLevel',
+        'FragmentationHigh', 'FragmentationMedium',
+        'Databases', 'OnlyModifiedStatistics'
+    )
+    $defaultedMappable = @($mappableOla | Where-Object { $olaMap[$_].Source -eq 'Default' })
+    $reviewReasons = @()
+    if ($defaultedMappable.Count -gt 0) {
+        if ($hasLegacyJob) {
+            $reviewReasons += "Legacy job present but mappable params fell back to defaults (tblDatabaseConfig likely missing rows): $($defaultedMappable -join ', ')"
+        }
+        else {
+            $reviewReasons += "No legacy job on this server; mappable params defaulted: $($defaultedMappable -join ', ')"
+        }
+    }
+    if ($sched.Source -eq 'Default') {
+        $reviewReasons += 'Schedule defaulted to 22:00 daily (no legacy schedule found)'
+    }
+    if ($reviewReasons.Count -gt 0) {
+        Write-Audit -SqlInstance $SqlInstance -Credential $Credential `
+            -Finding 'Deploy.ReviewRequired' -FindingValue 'True' -Source 'Warning' `
+            -Notes ($reviewReasons -join ' | ')
+        Write-Host "  review flag raised: $($reviewReasons -join ' | ')" -ForegroundColor Yellow
+    }
+
     $escCmd = $command -replace "'", "''"
     $escSchedName = $sched.Name -replace "'", "''"
 
@@ -704,9 +733,17 @@ END CATCH
 "@
     Invoke-Sql -SqlInstance $SqlInstance -Credential $Credential -Query $sql
 
-    Write-Audit -SqlInstance $SqlInstance -Credential $Credential -Finding 'Cutover.Legacy' -FindingValue 'Disabled' -Notes "job: $LegacyJobName"
+    if ($check.LegacyExists -eq 0) {
+        Write-Audit -SqlInstance $SqlInstance -Credential $Credential `
+            -Finding 'Cutover.Legacy' -FindingValue 'Skipped' -Source 'NoLegacy' `
+            -Notes "Legacy job '$LegacyJobName' not present on this server; nothing to disable."
+        Write-Host "  no legacy job on this server; new job enabled as greenfield deploy" -ForegroundColor Yellow
+    }
+    else {
+        Write-Audit -SqlInstance $SqlInstance -Credential $Credential -Finding 'Cutover.Legacy' -FindingValue 'Disabled' -Notes "job: $LegacyJobName"
+        Write-Host "  cutover complete. Legacy retained (disabled) for 30 days per brief §11." -ForegroundColor Green
+    }
     Write-Audit -SqlInstance $SqlInstance -Credential $Credential -Finding 'Cutover.New'    -FindingValue 'Enabled'  -Notes "job: $NewJobName"
-    Write-Host "  cutover complete. Legacy retained (disabled) for 30 days per brief §11." -ForegroundColor Green
 }
 
 # --------------------------------------------------------------------
