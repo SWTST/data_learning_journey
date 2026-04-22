@@ -369,11 +369,26 @@ function Build-OlaParams {
     $step2 = $LegacyJobSteps | Where-Object { $_.StepName -match 'Statistic' } | Select-Object -First 1
     if ($step2) {
         $p2 = Parse-LegacyStepParams $step2.StepCommand
-        if ($p2.ContainsKey('StatisticAgeHours') -and $p2.StatisticAgeHours -eq 0) {
-            $ola.OnlyModifiedStatistics = @{
-                Value  = 'N'
-                Source = 'Legacy'
-                Notes  = '@StatisticAgeHours=0 force-updated all stats'
+        if ($p2.ContainsKey('StatisticAgeHours') -and $null -ne $p2.StatisticAgeHours) {
+            $ageHours = [int]$p2.StatisticAgeHours
+            if ($ageHours -lt 24) {
+                # Legacy age threshold under a day -> every stat qualifies on daily or
+                # weekly runs, matching Ola's 'N' (update all stats).
+                $ola.OnlyModifiedStatistics = @{
+                    Value  = 'N'
+                    Source = 'Legacy'
+                    Notes  = "Legacy @StatisticAgeHours=$ageHours; mapped to 'N' (update all) because threshold < 24h covers all stats on daily/weekly schedules"
+                }
+            }
+            else {
+                # Threshold >= 24h could be intentional age-gating (e.g. weekly job
+                # with 48h threshold). Ola has no age-based filter; leave at default
+                # and flag for human review.
+                $ola.OnlyModifiedStatistics = @{
+                    Value  = $DefaultOlaParams.OnlyModifiedStatistics
+                    Source = 'Default'
+                    Notes  = "Legacy @StatisticAgeHours=$ageHours exceeds 24h; possible intentional age-gating - verify whether 'Y' (modified-only) or 'N' (all stats) is correct"
+                }
             }
         }
     }
@@ -634,7 +649,7 @@ EXEC msdb.dbo.sp_delete_job @job_name = N'$(($row.name) -replace "'","''")', @de
     $reviewReasons = @()
     if ($defaultedMappable.Count -gt 0) {
         if ($hasLegacyJob) {
-            $reviewReasons += "Legacy job present but mappable params fell back to defaults (tblDatabaseConfig likely missing rows): $($defaultedMappable -join ', ')"
+            $reviewReasons += "Legacy job present but mappable params fell back to defaults: $($defaultedMappable -join ', '). See per-param Deploy.Param.* rows for reasoning."
         }
         else {
             $reviewReasons += "No legacy job on this server; mappable params defaulted: $($defaultedMappable -join ', ')"
